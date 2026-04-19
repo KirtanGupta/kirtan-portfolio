@@ -1,11 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* District hover effects */
 html, body {
   width: 100%;
   height: 100%;
@@ -13,14 +6,73 @@ html, body {
   background: #050a0f;
   font-family: 'Share Tech Mono', monospace;
   cursor: crosshair;
+  margin: 0;
+  padding: 0;
 }
 
-:root {
-  --cyan:   #00ffb4;
-  --purple: #c084fc;
-  --blue:   #38bdf8;
-  --orange: #fb923c;
-  --pink:   #f472b6;
-  --yellow: #facc15;
-  --bg:     #050a0f;
+#__next, main {
+  width: 100%;
+  height: 100%;
+  background: #050a0f;
+}
+.district-group:hover .district-fill {
+  fill: v-bind(color);
+  stroke-width: 1.8px;
+  filter: brightness(1.3);
+}
+
+.district-group:hover .district-beacon {
+  r: 8;
+  filter: drop-shadow(0 0 14px currentColor);
+}
+
+.district-group:hover .district-sign {
+  font-size: 12px;
+}
+
+/* Simpler approach — just use CSS hover on the group */
+.district-group {
+  cursor: crosshair;
+}
+
+.district-group rect.district-fill {
+  transition: all 0.3s ease;
+}
+
+.district-group:hover rect.district-fill {
+  stroke-width: 2px;
+  filter: drop-shadow(0 0 12px rgba(255,255,255,0.3));
+}
+
+.district-group:hover circle.district-beacon {
+  filter: drop-shadow(0 0 16px white);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.district-group:hover rect.district-fill {
+  stroke-width: 2px;
+  fill: rgba(0,255,180,0.06);
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.15));
+}
+
+.district-group:hover circle.district-beacon {
+  filter: drop-shadow(0 0 18px white) !important;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.district-group:hover rect.district-fill {
+  stroke-width: 2px;
+  fill: rgba(0,255,180,0.06);
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.15));
+}
+
+.district-group:hover circle.district-beacon {
+  filter: drop-shadow(0 0 18px white) !important;
 }
