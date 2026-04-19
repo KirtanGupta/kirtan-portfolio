@@ -7,17 +7,40 @@ import ScanlineOverlay from '@/components/ScanlineOverlay'
 import SectionOverlay from '@/components/SectionOverlay'
 import ElectricLines from '@/components/ElectricLines'
 import LightningFlash from '@/components/LightningFlash'
+import AchievementBanner from '@/components/AchievementBanner'
+
+const ALL_DISTRICTS = ['home', 'about', 'skills', 'projects', 'resume', 'contact']
 
 export default function Home() {
   const [active, setActive] = useState<string | null>(null)
   const [zoomed, setZoomed] = useState(false)
   const [soundOn, setSoundOn] = useState(false)
+  const [visited, setVisited] = useState<Set<string>>(new Set())
+  const [showAchievement, setShowAchievement] = useState(false)
+  const achievementShown = useRef(false)
   const audioRef = useRef<AudioContext | null>(null)
   const gainRef = useRef<GainNode | null>(null)
 
   const handleDistrictClick = useCallback((id: string) => {
     setZoomed(true)
     setTimeout(() => setActive(id), 150)
+
+    // Track visited districts
+    setVisited(prev => {
+      const next = new Set(prev)
+      next.add(id)
+
+      // Check if all districts visited for first time
+      if (
+        next.size === ALL_DISTRICTS.length &&
+        !achievementShown.current
+      ) {
+        achievementShown.current = true
+        setTimeout(() => setShowAchievement(true), 800)
+      }
+
+      return next
+    })
   }, [])
 
   const handleClose = useCallback(() => {
@@ -81,6 +104,9 @@ export default function Home() {
       <RainEffect />
       <ScanlineOverlay />
 
+      {/* Achievement banner */}
+      <AchievementBanner show={showAchievement} />
+
       {/* HUD top bar */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0,
@@ -94,7 +120,7 @@ export default function Home() {
         zIndex: 200,
         fontFamily: "'Share Tech Mono', monospace",
       }}>
-        {/* Left — title */}
+        {/* Left */}
         <span style={{
           fontFamily: "'Orbitron', monospace",
           color: '#00ffb4', fontSize: '13px',
@@ -104,7 +130,7 @@ export default function Home() {
           NEO//FOLIO
         </span>
 
-        {/* Center — name */}
+        {/* Center */}
         <span style={{
           color: 'rgba(0,255,180,0.4)',
           fontSize: '10px', letterSpacing: '2px',
@@ -113,13 +139,23 @@ export default function Home() {
           KIRTAN JAGDISH GUPTA · FULL STACK DEVELOPER
         </span>
 
-        {/* Right — sound + status */}
+        {/* Right */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
           gap: '12px',
         }}>
+          {/* District counter */}
+          <span style={{
+            fontSize: '9px',
+            color: 'rgba(250,204,21,0.6)',
+            letterSpacing: '2px',
+            fontFamily: "'Share Tech Mono', monospace",
+          }}>
+            {visited.size}/{ALL_DISTRICTS.length} DISTRICTS
+          </span>
+
           <button
             onClick={toggleSound}
             style={{
@@ -138,6 +174,7 @@ export default function Home() {
           >
             {soundOn ? '🔊 SND:ON' : '🔇 SND:OFF'}
           </button>
+
           <span style={{
             color: '#ff2d78',
             fontSize: '10px',
@@ -186,7 +223,7 @@ export default function Home() {
           whiteSpace: 'nowrap',
           animation: 'blink 3s infinite',
         }}>
-          ↑ CLICK A DISTRICT TO ENTER ↑
+          ↑ CLICK A DISTRICT TO ENTER · {ALL_DISTRICTS.length - visited.size} REMAINING ↑
         </div>
       )}
 

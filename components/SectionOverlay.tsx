@@ -325,7 +325,7 @@ function SectionContent({ id, color }: { id: string; color: string }) {
       <Row label="FORMAT" value="PDF" />
       <Row label="CLEARANCE" value="OPEN ACCESS" highlight />
       <div
-        onClick={() => window.open('/resume/kirtan-resume.pdf', '_blank')}
+        onClick={() => window.open('/Kirtan_Gupta_Resume.pdf', '_blank')}
         style={{
           margin: '16px 0',
           padding: '14px',
