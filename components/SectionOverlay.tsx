@@ -355,17 +355,24 @@ function SectionContent({ id, color }: { id: string; color: string }) {
     </div>
   )
 
-  if (id === 'contact') return (
+  if(id === 'contact') return (
     <div>
-      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', lineHeight: 2, marginBottom: '16px', fontFamily: "'Share Tech Mono', monospace" }}>
-        Transmitting from Neo-Mumbai. Open to full-time roles, freelance missions, and collaborations. Response time: &lt;24h.
+      <div style={{
+        fontSize: '11px',
+        color: 'rgba(255,255,255,0.4)',
+        lineHeight: 2,
+        marginBottom: '20px',
+        fontFamily: "'Share Tech Mono', monospace"
+      }}>
+        Transmitting from Neo-Mumbai. Open to full-time roles, freelance missions, and collaborations.
       </div>
+
+      {/* Contact links */}
       {[
         { icon: '✉', label: d.contact.email, sub: 'PRIMARY CHANNEL', href: `mailto:${d.contact.email}` },
         { icon: '⬡', label: 'linkedin.com/in/kirtan-gupta-51866736a', sub: 'PROFESSIONAL NETWORK', href: d.contact.linkedin },
         { icon: '◈', label: 'github.com/KirtanGupta', sub: 'CODE REPOSITORY', href: d.contact.github },
         { icon: '◉', label: d.contact.twitter, sub: 'X / TWITTER', href: '#' },
-        { icon: '☎', label: d.contact.phone, sub: 'DIRECT LINE', href: `tel:${d.contact.phone}` },
       ].map(item => (
         <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer"
           style={{
@@ -375,7 +382,6 @@ function SectionContent({ id, color }: { id: string; color: string }) {
             marginBottom: '8px',
             textDecoration: 'none',
             transition: 'all 0.2s',
-            cursor: 'pointer',
           }}
           onMouseEnter={e => {
             e.currentTarget.style.borderColor = `${color}60`
@@ -397,8 +403,148 @@ function SectionContent({ id, color }: { id: string; color: string }) {
           </div>
         </a>
       ))}
+
+      {/* Contact Form */}
+      <ContactForm color={color} />
     </div>
   )
 
   return null
+}
+
+
+function ContactForm({ color }: { color: string }) {
+  const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  const handleSubmit = async () => {
+    if (!form.name || !form.email || !form.message) return
+
+    setStatus('sending')
+
+    try {
+      const emailjs = (await import('@emailjs/browser')).default
+
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+        },
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
+      )
+
+      setStatus('sent')
+      setForm({ name: '', email: '', message: '' })
+      setTimeout(() => setStatus('idle'), 4000)
+    } catch (e) {
+      console.error(e)
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 3000)
+    }
+  }
+
+  const inputStyle = {
+    width: '100%',
+    background: 'rgba(255,255,255,0.03)',
+    border: `1px solid rgba(255,255,255,0.1)`,
+    color: '#fff',
+    padding: '10px 14px',
+    fontFamily: "'Share Tech Mono', monospace",
+    fontSize: '11px',
+    letterSpacing: '1px',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+    boxSizing: 'border-box' as const,
+  }
+
+  return (
+    <div style={{ marginTop: '20px' }}>
+      {/* Section heading */}
+      <div style={{
+        fontSize: '8px', letterSpacing: '3px',
+        color: 'rgba(255,255,255,0.25)',
+        marginBottom: '14px',
+        fontFamily: "'Share Tech Mono', monospace",
+      }}>
+        SEND TRANSMISSION
+      </div>
+
+      {/* Name */}
+      <input
+        type="text"
+        placeholder="YOUR NAME"
+        value={form.name}
+        onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+        style={{ ...inputStyle, marginBottom: '10px', display: 'block' }}
+        onFocus={e => e.target.style.borderColor = color}
+        onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+      />
+
+      {/* Email */}
+      <input
+        type="email"
+        placeholder="YOUR EMAIL"
+        value={form.email}
+        onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+        style={{ ...inputStyle, marginBottom: '10px', display: 'block' }}
+        onFocus={e => e.target.style.borderColor = color}
+        onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+      />
+
+      {/* Message */}
+      <textarea
+        placeholder="YOUR MESSAGE..."
+        value={form.message}
+        onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+        rows={4}
+        style={{
+          ...inputStyle,
+          marginBottom: '12px',
+          display: 'block',
+          resize: 'none',
+        }}
+        onFocus={e => e.target.style.borderColor = color}
+        onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+      />
+
+      {/* Submit button */}
+      <div
+        onClick={status === 'idle' ? handleSubmit : undefined}
+        style={{
+          padding: '12px',
+          border: `1px solid ${status === 'sent' ? '#00ffb4' : status === 'error' ? '#ff2d78' : color}`,
+          textAlign: 'center',
+          cursor: status === 'idle' ? 'pointer' : 'default',
+          color: status === 'sent' ? '#00ffb4' : status === 'error' ? '#ff2d78' : color,
+          fontSize: '10px',
+          letterSpacing: '3px',
+          fontFamily: "'Orbitron', monospace",
+          transition: 'all 0.3s',
+          background: status === 'sent'
+            ? 'rgba(0,255,180,0.08)'
+            : status === 'error'
+            ? 'rgba(255,45,120,0.08)'
+            : 'transparent',
+        }}
+        onMouseEnter={e => {
+          if (status === 'idle') {
+            e.currentTarget.style.background = `${color}12`
+          }
+        }}
+        onMouseLeave={e => {
+          if (status === 'idle') {
+            e.currentTarget.style.background = 'transparent'
+          }
+        }}
+      >
+        {status === 'idle' && '→ TRANSMIT MESSAGE'}
+        {status === 'sending' && '⟳ TRANSMITTING...'}
+        {status === 'sent' && '✓ TRANSMISSION COMPLETE'}
+        {status === 'error' && '✕ TRANSMISSION FAILED — RETRY'}
+      </div>
+    </div>
+  )
 }
