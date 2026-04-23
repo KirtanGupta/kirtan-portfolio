@@ -1,13 +1,11 @@
 ﻿'use client'
 
 import { useState, useCallback, useRef } from 'react'
-import dynamic from 'next/dynamic'
 import ScanlineOverlay from '@/components/ScanlineOverlay'
 import SectionOverlay from '@/components/SectionOverlay'
 import LightningFlash from '@/components/LightningFlash'
 import AchievementBanner from '@/components/AchievementBanner'
-
-const CityScene = dynamic(() => import('@/components/scene/CityScene'), { ssr: false })
+import DeviceGate from '@/components/DeviceGate'
 
 const ALL_DISTRICTS = ['home', 'about', 'skills', 'projects', 'resume', 'contact']
 
@@ -143,14 +141,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 3D City */}
-      {/* 3D City */}
+      {/* City — 3D on desktop, 2D on mobile */}
       <div style={{
         position: 'absolute',
         top: '46px', left: 0, right: 0, bottom: 0,
         zIndex: 30,
       }}>
-        <CityScene
+        <DeviceGate
           onDistrictClick={handleDistrictClick}
           activeId={active}
         />
